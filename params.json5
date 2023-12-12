@@ -1,0 +1,11 @@
+{
+    "throw_distance" : 3980, // distance from projector to wall in mm
+    "model_width" : 2600, // width of model in mm
+    "model_height" : 1980, // height of model in mm
+
+    "data_url" : "http://localhost:5000",
+
+    "show_sun" : false, // show sun or not
+
+    "gtfs_update_time" : 2, // time in s between gtfs-realtime updates
+}
