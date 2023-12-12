@@ -38,6 +38,10 @@ module.exports = [
           type: 'asset/resource',
           use: ["file-loader?name=[name].[ext]"]
         },
+        {
+          test: /\.(csv|tsv|token)$/i,
+          use: ['csv-loader'],
+        },
       ],
     },
   },

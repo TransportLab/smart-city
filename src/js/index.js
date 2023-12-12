@@ -6,6 +6,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { manage_keypress } from './calibrate'
 import {Lut} from "./Lut";
+import { gettripupdates } from "./gtfs";
 
 const urlParams = new URLSearchParams(window.location.search);
 let p; // parameters to be loaded from json file
@@ -26,7 +27,7 @@ fetch("params.json5")
     });
 
 function init() {
-    p.projector_plane_distance_studs = p.projector_plane_distance_mm/p.mm_per_stud; // distance in mm
+    gettripupdates(p);
 
     clock = new THREE.Clock();
     scene = new THREE.Scene();

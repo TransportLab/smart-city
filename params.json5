@@ -3,7 +3,7 @@
     "model_width" : 2600, // width of model in mm
     "model_height" : 1980, // height of model in mm
 
-    "data_url" : "http://localhost:5000",
+    "gtfs_url" : "https://api.transport.nsw.gov.au/v2/gtfs/vehiclepos/sydneytrains",
 
     "show_sun" : false, // show sun or not
 

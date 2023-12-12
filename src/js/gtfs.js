@@ -1,23 +1,23 @@
 // from https://www.npmjs.com/package/gtfs-realtime-bindings
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
-import fetch from "node-fetch";
+import * as token from "../tfnsw.token";
 
-(async () => {
+let apikey = token[0][0];
+
+export async function gettripupdates(p) {
   try {
-    const response = await fetch("<GTFS-realtime source URL>", {
+    const res = await fetch(p.gtfs_url, {
       headers: {
-        "x-api-key": "<redacted>",
-        // replace with your GTFS-realtime source's auth token
-        // e.g. x-api-key is the header value used for NY's MTA GTFS APIs
+        "Authorization": "apikey " + apikey,
       },
+    //   mode: "cors"
     });
     if (!res.ok) {
       const error = new Error(`${res.url}: ${res.status} ${res.statusText}`);
       error.response = res;
       throw error;
-      process.exit(1);
     }
-    const buffer = await response.arrayBuffer();
+    const buffer = await res.arrayBuffer();
     const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
       new Uint8Array(buffer)
     );
@@ -29,6 +29,5 @@ import fetch from "node-fetch";
   }
   catch (error) {
     console.log(error);
-    process.exit(1);
   }
-})();
+};
