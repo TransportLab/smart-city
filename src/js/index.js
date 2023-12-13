@@ -4,9 +4,8 @@ import json_file from "../../params.json5";
 import JSON5 from 'json5';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { manage_keypress } from './calibrate'
-import {Lut} from "./Lut";
-import { gettripupdates } from "./gtfs";
+import { manage_keypress } from './calibrate.js'
+import {Lut} from "./Lut.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 let p; // parameters to be loaded from json file
@@ -27,7 +26,6 @@ fetch("params.json5")
     });
 
 function init() {
-    gettripupdates(p);
 
     clock = new THREE.Clock();
     scene = new THREE.Scene();
@@ -105,8 +103,11 @@ function init() {
     onWindowResize();
     window.addEventListener('keypress', function(e) { manage_keypress(camera,e) });
     
-
+    let bus_loc = get_bus_locations();
+    console.log(bus_loc);
     animate();
+
+
 
 }
 
@@ -134,3 +135,19 @@ function onWindowResize() {
 }
 
 
+function get_bus_locations() {
+    fetch('http://localhost:' + p.server_port + '/update_bus')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        // console.log(response.json())
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+}

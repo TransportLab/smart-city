@@ -11,8 +11,9 @@ Augmented reality smart city installation.
   2. Install [Node.js](https://nodejs.org/en/)
   3. Install with `npm install`
   4. Install `webpack` with `npm install -g webpack` (may require `sudo`)
-  5. Go to https://opendata.transport.nsw.gov.au/ and create an account. After you have an account you can make an API key, with will be a long string. copy that string into an empty text file called `tfnsw.token` and place it into the`resources` folder.
-  6. Run `npm run start` to build the project and deploy to the browser
+  5. Go to https://opendata.transport.nsw.gov.au/ and create an account. After you have an account you can make an API key, with will be a long string. copy that string into the placeholder in `keys_template.json5` and rename the file to `keys.json5`.
+  6. Open a terminal and navigate to the project directory. Run `npm run server` to start the server.
+  7. In a second terminal window run `npm run start` to build the projector interface and deploy to the browser
 
 ## Usage
 Many system parameters are controlled by URL flags, such as `debug` which can be used as:
