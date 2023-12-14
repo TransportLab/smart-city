@@ -59,7 +59,8 @@ app.get('/update_bus', async (req, res) => {
         // console.log(feed)
         feed.entity.forEach((entity) => {
           if (entity.vehicle) {
-            locs.push(entity.vehicle.position);
+            // console.log(entity)
+            locs.push(entity.vehicle);
           }
         });
         // send the data back to the client

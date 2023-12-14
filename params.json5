@@ -1,21 +1,22 @@
 {
-    "throw_distance" : 3980, // distance from projector to wall in mm
-    projector_aspect_ratio : 1.6, // aspect ratio of projector
-    "projector_resolution" : [1920, 1080], // resolution of projector
-    
+    // leaflet settings
+    "map_center" : {
+        lat : -33.869303486200685,
+        lng : 151.2071629479017
+    }, // center of map
+    "map_zoom" : 13.7, // zoom level of map
+
+    // threejs settings
     "model_width" : 2600, // width of model in mm
     "model_height" : 1980, // height of model in mm
-
-
-    // object is at [0,0,0] with normal in +y direction
     "camera_location" : [0, 0, 0], // location of camera in mm
     "camera_rotation" : [0, 0, 0], // rotation of camera in degrees, Euler angles
+    "throw_distance" : 3980, // distance from projector to wall in mm
+    "projector_aspect_ratio" : 1.6, // aspect ratio of projector
+    "projector_resolution" : [1920, 1080], // resolution of projector
 
+    // gtfs settings
     "gtfs_url" : "https://api.transport.nsw.gov.au/v2/gtfs/vehiclepos/sydneytrains",
-
-    "show_sun" : false, // show sun or not
-
-    "gtfs_update_time" : 2, // time in s between gtfs-realtime updates
-
+    "update_interval" : 5000, // time in s between gtfs-realtime updates
     "server_port" : 3000, // port to run server on
 }

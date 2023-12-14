@@ -6,7 +6,8 @@ module.exports = [
   {
     mode: "development",
     // mode: "production",
-    entry: './src/js/index.js',
+    entry: './src/js/index-leaflet.js',
+    // entry: './src/js/index-three.js',
     plugins: [
       new webpack.ProvidePlugin({
         THREE: 'three'
@@ -14,7 +15,7 @@ module.exports = [
       new HtmlWebpackPlugin({
         title: 'smart city',
         favicon: "./resources/favicon.ico",
-        // template: "index.html",
+        template: "index.html",
       }),
     ],
     output: {
