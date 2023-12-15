@@ -2,9 +2,9 @@
 Augmented reality smart city installation.
 
 ## Components
-  1. 3D printed model of a city pulled from OSM
+  1. 3D model of a city
   2. three.js scene rendered in chrome sent to a projector
-  3. live transport data from Transport for NSW
+  3. live data to display
 
 ## Installation
   1. Download or clone this repository
