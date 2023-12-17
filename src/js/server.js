@@ -5,7 +5,7 @@ import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import json5 from 'json5';
 import fs from 'fs';
 import { gettripupdates } from './gtfs.js';
-
+import Papa from 'papaparse';
 // import * as token from "../tfnsw.token";
 
 const app = express()
@@ -15,7 +15,7 @@ const port = 3000
 // let p; // parameters to be loaded from json file
 
 // Function to read and parse the JSON5 file
-function readJson5File(filePath) {
+function parseJson5File(filePath) {
     try {
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       return json5.parse(fileContent);
@@ -23,10 +23,34 @@ function readJson5File(filePath) {
       console.error('Error reading or parsing JSON5 file:', error);
       return null;
     }
-  }
+}
 
-const p = readJson5File('params.json5');
-const keys = readJson5File('keys.json5');
+
+function parseCSV(filePath) {
+    try {
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        let out = Papa.parse(fileContent, {
+            header: true,
+            complete: function(results) {
+                let out = {};
+                results.data.forEach(function(row) {
+                    var key = row["route_id"];
+                    var value = row["route_short_name"];
+                    out[key] = value;
+                });
+            return out;
+            }
+        });
+        return out;
+    } catch (error) {
+        console.error('Error reading or parsing JSON5 file:', error);
+        return null;
+    }
+}
+
+let p = parseJson5File('params.json5');
+let keys = parseJson5File('keys.json5');
+let routes = parseCSV('resources/routes.txt');
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -57,10 +81,16 @@ app.get('/update_bus', async (req, res) => {
           new Uint8Array(buffer)
         );
         // console.log(feed)
-        feed.entity.forEach((entity) => {
-          if (entity.vehicle) {
-            // console.log(entity)
-            locs.push(entity.vehicle);
+        feed.entity.forEach((e) => {
+          if (e.vehicle) {
+            // let routeId = e.vehicle.trip.routeId.split('_')[0];
+            // e['short_route_id'] = routes[routeId];
+            // console.log(e.vehicle.trip)
+            // if ( e.vehicle.trip.routeId.includes('T3') ) {
+            //     console.log(e.vehicle.trip.routeId)
+            // }
+
+            locs.push(e);
           }
         });
         // send the data back to the client

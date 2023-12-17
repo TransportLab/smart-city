@@ -1,3 +1,7 @@
 {
-    "tfnsw" : "put your api key here",
+    "tfnsw" : "Put your TfNSW API key here",
+    "mapbox" : 
+    { id: 'Put your Mapbox map ID here',
+      token : 'Put your Mapbox API token here'
+    }
 }
