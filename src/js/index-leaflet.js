@@ -10,10 +10,131 @@ import JSON5 from 'json5';
 let map;
 const urlParams = new URLSearchParams(window.location.search);
 let p; // parameters to be loaded from json file
-let icons = [];
+let icons = {};
 let lut = new Lut('bwr',32);
 lut.setMin(-3);
 lut.setMax(3);
+
+let markerHtmlStyle = `
+    width: 24px !important;
+    height: 24px !important;
+    margin-left: -12px;
+    margin-top: -12px;
+    border-radius: 18px;
+    text-align: center;
+    font-size: 6px;
+    color: white;
+    padding: 2px;
+    border: 1px solid white;
+`
+
+let routes = {
+    'NSN' : { // north shore & western line
+        label : 'T1', 
+        color: '#F99D1C',
+    },
+    'IWL' : { // inner west & leppington line
+        label : 'T2', 
+        color: '#0098CD',
+    },
+    'BNK' : { // bankstown line
+        label : 'T3', 
+        color: '#F37021',
+    },
+    'ESI' : { // eastern suburbs & illawarra line
+        label : 'T4', 
+        color: '#005AA3',
+    },
+    'CMB' : { // cumberland line
+        label : 'T5', 
+        color: '#C4258F',
+    },
+    // there is no T6!
+    'OLY' : { // carlingford line
+        label : 'T7', 
+        color: '#6F818E',
+    },
+    'APS' : { // airport & south line
+        label : 'T8', 
+        color: '#00954C',
+    }, 
+    'NTH' : { // northern line
+        label : 'T9', 
+        color: '#D11F2F',
+    }, 
+    // intercity trains
+    'BMT' : { // blue mountains line
+        label : 'BMT', 
+        color: '#F99D1C',
+    },
+    'CCN' : { // central coast & newcastle line
+        label : 'CCN', 
+        color: '#D11F2F',
+    },
+    'HUN' : { // hunter line
+        label : 'CCN', 
+        color: '#833134',
+    },
+    'SCO' : { // south coast line
+        label : 'SCO',
+        color: '#005AA3',
+    },
+    'IWLR-191' : { // L1 Dulwich Hill Line
+        label : 'L1',
+        color: '#BE1622',
+    },
+    '1001_L2' : { // L2 Randwick Line
+        label : 'L2',
+        color: '#DD1E25',
+    },
+    '1001_L3' : { // L3 Kingsford Line
+        label : 'L3',
+        color: '#781140',
+    },
+}
+
+let ferries = {
+    'F1' : { // Manly
+        label : 'F1',
+        color: '#00774B',
+    },
+    'F2' : { // Taronga Zoo
+        label : 'F2',
+        color: '#144734',
+    },
+    'F3' : { // Parramatta River
+        label : 'F3',
+        color: '#648C3C',
+    },
+    'F4' : { // Pyrmont Bay
+        label : 'F4',
+        color: '#BFD730',
+    },
+    'F5' : { // Neutral Bay
+        label : 'F5',
+        color: '#286142',
+    },
+    'F6' : { // Mosman Bay
+        label : 'F6',
+        color: '#00AB51',
+    },
+    'F7' : { // Double Bay
+        label : 'F7',
+        color: '#00B189',
+    },
+    'F8' : { // Cockatoo Island
+        label : 'F8',
+        color: '#55622B',
+    },
+    'F9' : { // Watsons Bay
+        label : 'F9',
+        color: '#65B32E',
+    },
+    'F10' : { // Blackwattle Bay
+        label : 'F10',
+        color: '#469B3B',
+    },
+}
 
 fetch("params.json5")
     .then(r => 
@@ -25,9 +146,6 @@ fetch("params.json5")
     });
 
 function init() {
-    let bus_loc = get_bus_locations();
-    // console.log(bus_loc);
-
     // Initialize the map
     map = L.map('map', {
       center: [p.map_center.lat, p.map_center.lng],
@@ -60,45 +178,84 @@ function init() {
     setInterval(animate, p.update_interval);
 }
 
-function animate() {
-    for ( let i=icons.length-1; i>=0; i--) {
-        map.removeLayer(icons[i]);
-        icons.pop();
-    }  
-    
-    get_bus_locations()
-    .then(data => {
-        data.forEach((e) => {
-            if ( map.getBounds().contains(new L.LatLng(e.vehicle.position.latitude, e.vehicle.position.longitude)) ) {
-                let color;
-                // console.log(e)
-                // if ( e.congestionLevel == "UNKNOWN_CONGESTION_LEVEL" ) {
-                //     color = lut.getColor(0).getHexString();
-                // } else {
-                // console.log(e.short_route_id)
-                // color = lut.getColor(e.vehicle.occupancyStatus).getHexString();
-                // }
-                
-                // console.log('#' + color)
-                var icon = L.marker([e.vehicle.position.latitude, e.vehicle.position.longitude], {
-                    icon: L.divIcon({
-                        className: 'train-icon',
-                        html: '<div class="train-icon">T2</div>'
-                        // html: '<div class="train-icon" style="background-color: #' + String(color) +'">'+e.short_route_id+'</div>'
-                        // html: 'HI!'
 
-                    })
-                }); 
-                // console.log(icon)   
-                // icon._icon.style.color = 'red';
-                icon.addTo(map);
-                icons.push(icon);
-            }
+function animate() {
+    // for ( let i=icons.length-1; i>=0; i--) {
+    for (let key in icons ) {
+        if ( icons[key].updated = false ) {
+            map.removeLayer(icons[key]);
+            delete icons[key];
+        } else {
+            icons[key].updated = false;
+        }
+    };  
+    
+    p.modes.forEach((mode) => {
+        // console.log(mode)
+        get_locations(mode)
+        .then(data => {
+            data.forEach((e) => {
+                // console.log(e.vehicle.trip.routeId)
+                if ( e.vehicle.position !== undefined ) {
+                    if ( map.getBounds().contains(new L.LatLng(e.vehicle.position.latitude, e.vehicle.position.longitude)) ) {
+                        if ( e.vehicle.trip.routeId !== undefined ) {
+                            let route, color, label;
+                            let skip = false;
+                            if ( mode === 'sydneytrains' ) {
+                                route = e.vehicle.trip.routeId.split('_')[0];
+                                if ( route in routes ) {
+                                    label = routes[route]['label'];
+                                    color = routes[route]['color'];
+                                } else {
+                                    skip = true;
+                                }
+                            } else if ( mode === 'buses' ) { 
+                                route = e.vehicle.trip.routeId.split('_')[1];
+                                color = '#00B5EF';
+                                label = route;
+                            } else if ( mode === 'ferries/sydneyferries' ) {
+                                route = e.vehicle.trip.routeId.split('-')[1];
+                                if ( route in ferries ) {
+                                    color = ferries[route]['color'];
+                                    label = route;
+                                } else {
+                                    skip = true;
+                                }
+                            }
+                            else { // lightrail
+                                route = e.vehicle.trip.routeId
+                                if ( route in routes ) {
+                                    label = routes[route]['label'];
+                                    color = routes[route]['color'];
+                                } else {
+                                    skip = true;
+                                }
+                            }
+                            // console.log(route)
+                            if ( !skip ) {
+                                if (e.vehicle.vehicle.id in icons) {
+                                    icons[e.vehicle.vehicle.id].setLatLng([e.vehicle.position.latitude, e.vehicle.position.longitude]);
+                                } else {
+                                    var icon = L.marker([e.vehicle.position.latitude, e.vehicle.position.longitude], {
+                                        icon: L.divIcon({
+                                            className: '',
+                                            html: '<span style="' + markerHtmlStyle + ';background-color:'+color+'">'+label+'</span>'
+                                        })
+                                    }); 
+                                    icon.updated = true;
+                                    icons[e.vehicle.vehicle.id] = icon;
+                                    icon.addTo(map);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching locations:', error);
+            // Handle the error
         });
-    })
-    .catch(error => {
-        console.error('Error fetching bus locations:', error);
-        // Handle the error
     });
     
     
@@ -112,8 +269,8 @@ function animate() {
     // console.log(icon)
 }
 
-function get_bus_locations() {
-    return fetch('http://localhost:' + p.server_port + '/update_bus')
+function get_locations(mode) {
+    return fetch('http://localhost:' + p.server_port + '/update/' + mode)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');

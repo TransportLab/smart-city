@@ -16,7 +16,9 @@
     "projector_resolution" : [1920, 1080], // resolution of projector
 
     // gtfs settings
-    "gtfs_url" : "https://api.transport.nsw.gov.au/v2/gtfs/vehiclepos/sydneytrains",
+    "gtfs_url" : "https://api.transport.nsw.gov.au/v1/gtfs/vehiclepos/",
+    "modes" : ['buses', 'sydneytrains', 'lightrail/innerwest', 'lightrail/cbdandsoutheast', 'ferries/sydneyferries'],
+    // "modes" : ['ferries/sydneyferries'],
     "update_interval" : 5000, // time in s between gtfs-realtime updates
     "server_port" : 3000, // port to run server on
 }
