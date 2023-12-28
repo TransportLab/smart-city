@@ -1,18 +1,20 @@
 {
-    "tfnsw" : "Put your TfNSW API key here",
-    "mapbox" : 
-    { id: 'Put your Mapbox map ID here',
-      token : 'Put your Mapbox API token here'
-    }
-}
-{
-    tfnsw : {
+    tfnsw :
+    {
       token : "Put your TfNSW API key here"
     },
     mapbox : 
-    { id: 'Put your Mapbox map ID here',
+    {
+      id: 'Put your Mapbox map ID here',
       token : 'Put your Mapbox API token here'
     },
     ais :
-    {token : "Put your aisstream.io token here" }
+    {
+      token : "Put your aisstream.io token here"
+    },
+    opensky :
+    {
+      username : "Put your OpenSky username here",
+      password : "Put your OpenSky password here"
+    }
 }

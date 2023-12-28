@@ -71,9 +71,31 @@ app.get('/update/*', async (req, res) => {
       }
   });
 
-  app.get('/update_ships/', async (req, res) => {
-    res.json(ships);
-  });
+app.get('/update_ships/', async (req, res) => {
+  res.json(ships);
+});
+
+app.get('/update_flights/', async (req, res) => {
+  // Use fetch to get the data
+fetch(p.flights.url, {
+  headers: new Headers({
+    'Authorization': 'Basic ' + keys.flights.username + ':' + keys.flights.password  // Basic Authentication
+  })
+})
+.then(response => {
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();  // Parse the JSON of the response
+})
+.then(json => {
+  // Here, you have your formatted JSON
+  res.json(json);
+})
+.catch(error => {
+  console.error('There has been a problem with your fetch operation:', error);
+});
+});
 
 const socket = new WebSocket(p.ais.url);
 
@@ -94,14 +116,16 @@ socket.onmessage = function (event) {
     let m = JSON.parse(event.data)
     // console.log(m)
     let name = m.MetaData.ShipName.trim().replaceAll(' ', '&nbsp;').replaceAll('-', '&#8209;');
-    if ( m.Message.PositionReport.TrueHeading == 511) {
-      m.Message.PositionReport.TrueHeading = 0; // data unaviailable
-    }
+    // if ( m.Message.PositionReport.TrueHeading == 511) {
+    //   m.Message.PositionReport.TrueHeading = 0; // data unaviailable
+    // }
+    let angle = m.Message.PositionReport.TrueHeading === 511 ? m.Message.Cog : m.Message.PositionReport.TrueHeading;
+
     ships[name] = {
      'lat' : m.MetaData.latitude,
       'lon' : m.MetaData.longitude,
       'updated' : m.MetaData.time_utc,
-      'angle' : m.Message.PositionReport.TrueHeading
+      'angle' : angle
     }
 };
 

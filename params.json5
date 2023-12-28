@@ -32,7 +32,7 @@
         port : 3000, // port to run server on
     },
 
-    // gtfs settings
+    // transit settings
     gtfs : {
         show : true, // show gtfs data on map
         url : "https://api.transport.nsw.gov.au/v1/gtfs/vehiclepos/",
@@ -40,10 +40,17 @@
         update_interval : 5000, // time in s between gtfs-realtime updates
     },
 
-    // ais settings
+    // maritime settings
     ais : {
-        show : true, // show ais data on map
+        show : false, // show ais data on map
         url : "wss://stream.aisstream.io/v0/stream",
         update_interval : 5000, // time in s between ais updates
+    },
+
+    // flight tracking settings
+    flights : {
+        show : true, // show flight data on map
+        url : 'https://opensky-network.org/api',
+        update_interval : 21000, // time in s between flight updates, limited by API. Could go faster if just running part of the day
     }
 }

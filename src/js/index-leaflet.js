@@ -10,8 +10,9 @@ import JSON5 from 'json5';
 let map;
 const urlParams = new URLSearchParams(window.location.search);
 let p; // parameters to be loaded from json file
-let icons = {};
-let ship_icons = {};
+let vehicles = {};
+let ships = {};
+let planes = {}
 let lut = new Lut('bwr',32);
 lut.setMin(-3);
 lut.setMax(3);
@@ -169,13 +170,12 @@ function init() {
 
 
 function animate() {
-    // for ( let i=icons.length-1; i>=0; i--) {
-    for (let key in icons ) {
-        if ( icons[key].updated = false ) {
-            map.removeLayer(icons[key]);
-            delete icons[key];
+    for (let key in vehicles ) {
+        if ( vehicles[key].updated = false ) {
+            map.removeLayer(vehicles[key]);
+            delete vehicles[key];
         } else {
-            icons[key].updated = false;
+            vehicles[key].updated = false;
         }
     };  
     
@@ -239,8 +239,8 @@ function update_gtfs() {
                             }
                             // console.log(route)
                             if ( !skip ) {
-                                if (e.vehicle.vehicle.id in icons) {
-                                    icons[e.vehicle.vehicle.id].setLatLng([e.vehicle.position.latitude, e.vehicle.position.longitude]);
+                                if (e.vehicle.vehicle.id in vehicles) {
+                                    vehicles[e.vehicle.vehicle.id].setLatLng([e.vehicle.position.latitude, e.vehicle.position.longitude]);
                                 } else {
                                     var icon = L.marker([e.vehicle.position.latitude, e.vehicle.position.longitude], {
                                         icon: L.divIcon({
@@ -249,7 +249,7 @@ function update_gtfs() {
                                         })
                                     }); 
                                     icon.updated = true;
-                                    icons[e.vehicle.vehicle.id] = icon;
+                                    vehicles[e.vehicle.vehicle.id] = icon;
                                     icon.addTo(map);
                                 }
                             }
@@ -266,11 +266,12 @@ function update_gtfs() {
 }
 
 function update_ships() {
-    get_ships().then(ships => {
-        for (const [key, e] of Object.entries(ships)) {
+    get_ships().then(new_ships => {
+        for (const [key, e] of Object.entries(new_ships)) {
             if ( map.getBounds().contains(new L.LatLng(e.lat, e.lon)) ) {
-                if (key in ship_icons) {
-                    ship_icons[key].setLatLng([e.lat, e.lon]);
+                if (key in ships) {
+                    ships[key].setLatLng([e.lat, e.lon]);
+                    ships[key].updated = e.updated;
                 } else {
                     // console.log(key)
                     var icon = L.marker([e.lat, e.lon], {
@@ -279,26 +280,19 @@ function update_ships() {
                             html: '<span class="ship" id="'+key+'">'+key+'</span>'
                         })
                     }); 
-                    icon.updated = true;
-                    ship_icons[key] = icon;
+                    icon.updated = e.updated;
+                    ships[key] = icon;
                     icon.addTo(map);
                 }
-                // console.log(document.getElementById(key))
                 let el = document.getElementById(key);
                 if ( el !== null ) { // wait for element to exist 
-                    el.style.color = 'red'
                     var newRotation =  'rotate(' + parseInt(parseFloat(e.angle) - 90) + 'deg)';
-                    console.log(newRotation)
                     var currentTransform = window.getComputedStyle(el.parentElement).transform;
                     if (currentTransform === 'none') {
                         currentTransform = ''; // Set to an empty string if no transform has been applied
                       }
                     el.parentElement.style.transform = currentTransform + ' ' + newRotation;
-                    el.parentElement.style.transform_origin = 'center';
-                    console.log(key)
-                    console.log(el.parentElement.style.transform)
-                // console.log(ship_icons[key])
-                // console.log(e.angle)
+                    el.parentElement.style.transformOrigin = 'center';
                 }
             }
         }
@@ -332,3 +326,18 @@ function get_ships() {
         throw error; // Re-throw to propagate the error
     });
 }
+
+setInterval(function(){
+    remove_old_ships(ships);
+  }, 10000);
+  
+  function remove_old_ships(ships) {
+    let now = Date.now();
+    for (const [key, value] of Object.entries(ships)) {
+      if (now - Date.parse(value.updated) > 300000) { // remove older than 5 mins (should refresh at least once every 3 mins)
+        map.removeLayer(ships[key]);
+        delete ships[key];
+        console.log('Removing: ' + key)
+      }
+    }
+  }
