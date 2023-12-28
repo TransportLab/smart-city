@@ -38,7 +38,8 @@
     "style-loader": "^3.3.2",
     "three": "^0.159.0",
     "webpack": "^5.81.0",
-    "webpack-cli": "^5.0.2"
+    "webpack-cli": "^5.0.2",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "webpack-dev-server": "^4.13.3"

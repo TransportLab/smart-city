@@ -1,24 +1,49 @@
 {
+    // model properties
+    model : {
+        width : 2600, // width of model in mm
+        height : 1980, // height of model in mm
+        throw_distance : 3980, // distance from projector to wall in mm
+    },
+
+    // projector settings
+    projector : {
+        aspect_ratio : 1.6, // aspect ratio of projector
+        resolution : [1920, 1080], // resolution of projector
+    },
+
     // leaflet settings
-    "map_center" : {
-        lat : -33.869303486200685,
-        lng : 151.2071629479017
-    }, // center of map
-    "map_zoom" : 13.7, // zoom level of map
+    map : {
+        center : {
+            lat : -33.869303486200685,
+            lng : 151.2071629479017
+        }, // center of map
+        zoom : 13.7, // zoom level of map
+    },
 
     // threejs settings
-    "model_width" : 2600, // width of model in mm
-    "model_height" : 1980, // height of model in mm
-    "camera_location" : [0, 0, 0], // location of camera in mm
-    "camera_rotation" : [0, 0, 0], // rotation of camera in degrees, Euler angles
-    "throw_distance" : 3980, // distance from projector to wall in mm
-    "projector_aspect_ratio" : 1.6, // aspect ratio of projector
-    "projector_resolution" : [1920, 1080], // resolution of projector
+    threejs : {
+        camera_location : [0, 0, 0], // location of camera in mm
+        camera_rotation : [0, 0, 0], // rotation of camera in degrees, Euler angles
+    },
+
+    // server settings
+    server : {
+        port : 3000, // port to run server on
+    },
 
     // gtfs settings
-    "gtfs_url" : "https://api.transport.nsw.gov.au/v1/gtfs/vehiclepos/",
-    "modes" : ['buses', 'sydneytrains', 'lightrail/innerwest', 'lightrail/cbdandsoutheast', 'ferries/sydneyferries'],
-    // "modes" : ['ferries/sydneyferries'],
-    "update_interval" : 5000, // time in s between gtfs-realtime updates
-    "server_port" : 3000, // port to run server on
+    gtfs : {
+        show : true, // show gtfs data on map
+        url : "https://api.transport.nsw.gov.au/v1/gtfs/vehiclepos/",
+        modes : ['buses', 'sydneytrains', 'lightrail/innerwest', 'lightrail/cbdandsoutheast', 'ferries/sydneyferries'],
+        update_interval : 5000, // time in s between gtfs-realtime updates
+    },
+
+    // ais settings
+    ais : {
+        show : true, // show ais data on map
+        url : "wss://stream.aisstream.io/v0/stream",
+        update_interval : 5000, // time in s between ais updates
+    }
 }

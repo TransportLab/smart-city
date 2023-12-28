@@ -11,22 +11,10 @@ let map;
 const urlParams = new URLSearchParams(window.location.search);
 let p; // parameters to be loaded from json file
 let icons = {};
+let ship_icons = {};
 let lut = new Lut('bwr',32);
 lut.setMin(-3);
 lut.setMax(3);
-
-let markerHtmlStyle = `
-    width: 24px !important;
-    height: 24px !important;
-    margin-left: -12px;
-    margin-top: -12px;
-    border-radius: 18px;
-    text-align: center;
-    font-size: 6px;
-    color: white;
-    padding: 2px;
-    border: 1px solid white;
-`
 
 let routes = {
     'NSN' : { // north shore & western line
@@ -148,13 +136,14 @@ fetch("params.json5")
 function init() {
     // Initialize the map
     map = L.map('map', {
-      center: [p.map_center.lat, p.map_center.lng],
-      zoom: p.map_zoom,
+      center: [p.map.center.lat, p.map.center.lng],
+      zoom: p.map.zoom,
       attributionControl: false,
       zoomControl : false,
       zoomSnap: 0.01,
     //   scrollWheelZoom: false,
     });
+    p.map.bounds = map.getBounds();
     L.control.attribution({attributionControl: false});//.addTo(map);
   
     
@@ -175,7 +164,7 @@ function init() {
     });
    
 
-    setInterval(animate, p.update_interval);
+    setInterval(animate, p.gtfs.update_interval);
 }
 
 
@@ -190,7 +179,24 @@ function animate() {
         }
     };  
     
-    p.modes.forEach((mode) => {
+    if ( p.gtfs.show ) {
+        update_gtfs();
+    }
+    if ( p.ais.show ) {
+        update_ships();
+    }
+      
+      
+    // window.setInterval(() => {
+    //     icon._latlng.lat += 0.0001;
+    //     icon._latlng.lng += 0.0001;
+    //     icon.setLatLng(icon._latlng);
+    // }, 100);
+    // console.log(icon)
+}
+
+function update_gtfs() {
+    p.gtfs.modes.forEach((mode) => {
         // console.log(mode)
         get_locations(mode)
         .then(data => {
@@ -239,7 +245,7 @@ function animate() {
                                     var icon = L.marker([e.vehicle.position.latitude, e.vehicle.position.longitude], {
                                         icon: L.divIcon({
                                             className: '',
-                                            html: '<span style="' + markerHtmlStyle + ';background-color:'+color+'">'+label+'</span>'
+                                            html: '<span class="gtfs" style="background-color:'+color+'">'+label+'</span>'
                                         })
                                     }); 
                                     icon.updated = true;
@@ -257,28 +263,72 @@ function animate() {
             // Handle the error
         });
     });
-    
-    
-      
-      
-    // window.setInterval(() => {
-    //     icon._latlng.lat += 0.0001;
-    //     icon._latlng.lng += 0.0001;
-    //     icon.setLatLng(icon._latlng);
-    // }, 100);
-    // console.log(icon)
+}
+
+function update_ships() {
+    get_ships().then(ships => {
+        for (const [key, e] of Object.entries(ships)) {
+            if ( map.getBounds().contains(new L.LatLng(e.lat, e.lon)) ) {
+                if (key in ship_icons) {
+                    ship_icons[key].setLatLng([e.lat, e.lon]);
+                } else {
+                    // console.log(key)
+                    var icon = L.marker([e.lat, e.lon], {
+                        icon: L.divIcon({
+                            className: '',
+                            html: '<span class="ship" id="'+key+'">'+key+'</span>'
+                        })
+                    }); 
+                    icon.updated = true;
+                    ship_icons[key] = icon;
+                    icon.addTo(map);
+                }
+                // console.log(document.getElementById(key))
+                let el = document.getElementById(key);
+                if ( el !== null ) { // wait for element to exist 
+                    el.style.color = 'red'
+                    var newRotation =  'rotate(' + parseInt(parseFloat(e.angle) - 90) + 'deg)';
+                    console.log(newRotation)
+                    var currentTransform = window.getComputedStyle(el.parentElement).transform;
+                    if (currentTransform === 'none') {
+                        currentTransform = ''; // Set to an empty string if no transform has been applied
+                      }
+                    el.parentElement.style.transform = currentTransform + ' ' + newRotation;
+                    el.parentElement.style.transform_origin = 'center';
+                    console.log(key)
+                    console.log(el.parentElement.style.transform)
+                // console.log(ship_icons[key])
+                // console.log(e.angle)
+                }
+            }
+        }
+    });
 }
 
 function get_locations(mode) {
-    return fetch('http://localhost:' + p.server_port + '/update/' + mode)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json(); // Return the parsed JSON
-        })
-        .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-            throw error; // Re-throw to propagate the error
-        });
+    return fetch('http://localhost:' + p.server.port + '/update/' + mode)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Return the parsed JSON
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        throw error; // Re-throw to propagate the error
+    });
+}
+
+function get_ships() {
+    return fetch('http://localhost:' + p.server.port + '/update_ships/')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Return the parsed JSON
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        throw error; // Re-throw to propagate the error
+    });
 }

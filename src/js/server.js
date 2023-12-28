@@ -2,62 +2,28 @@ import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
-import json5 from 'json5';
-import fs from 'fs';
+
 import { gettripupdates } from './gtfs.js';
 import Papa from 'papaparse';
+import WebSocket from 'ws';
+
+// import { socket } from './ships.js';
+import * as HELPERS from './helpers.js';
 // import * as token from "../tfnsw.token";
 
 const app = express()
 app.use(cors());
-const port = 3000
 
-// let p; // parameters to be loaded from json file
-
-// Function to read and parse the JSON5 file
-function parseJson5File(filePath) {
-    try {
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      return json5.parse(fileContent);
-    } catch (error) {
-      console.error('Error reading or parsing JSON5 file:', error);
-      return null;
-    }
-}
-
-// Function to read and parse the 
-function parseCSVtoDict(filePath, key_string, value_string) {
-    try {
-        const fileContent = fs.readFileSync(filePath, 'utf-8');
-        let out = Papa.parse(fileContent, {
-            header: true,
-            complete: function(results) {
-                let out = {};
-                results.data.forEach(function(row) {
-                    var key = row[key_string];
-                    var value = row[value_string];
-                    out[key] = value;
-                });
-            return out;
-            }
-        });
-        return out;
-    } catch (error) {
-        console.error('Error reading or parsing JSON5 file:', error);
-        return null;
-    }
-}
-
-let p = parseJson5File('params.json5');
-let keys = parseJson5File('keys.json5');
+export let p = HELPERS.parseJson5File('params.json5');
+export let keys = HELPERS.parseJson5File('keys.json5');
 // let routes = parseCSVtoDict('resources/routes.txt',"route_id","route_short_name");
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.listen(p.server.port, () => {
+  console.log(`Server listening on port ${p.server.port}`);
 })
 
 app.get('/update/*', async (req, res) => {
@@ -67,9 +33,9 @@ app.get('/update/*', async (req, res) => {
     // const route = let joined = strings.slice(0, -1).join(", "); // Joins all but the last element'
 
     try {
-        const res2 = await fetch(p.gtfs_url + req.params[0], {
+        const res2 = await fetch(p.gtfs.url + req.params[0], {
           headers: {
-            "Authorization": "apikey " + keys.tfnsw,
+            "Authorization": "apikey " + keys.tfnsw.token,
             // "Access-Control-Allow-Origin" : 'origin',
             // "accept": "application/x-google-protobuf"
           },
@@ -104,3 +70,50 @@ app.get('/update/*', async (req, res) => {
         console.log(error);
       }
   });
+
+  app.get('/update_ships/', async (req, res) => {
+    res.json(ships);
+  });
+
+const socket = new WebSocket(p.ais.url);
+
+socket.onopen = function (_) {
+    let delta = 0.2;
+    let subscriptionMessage = {
+        Apikey: keys.ais.token,
+        BoundingBoxes: [[[p.map.center.lat - delta, p.map.center.lng - delta], [p.map.center.lat + delta, p.map.center.lng + delta]]],
+        // FiltersShipMMSI: ["368207620", "367719770", "211476060"], // Optional!
+        FilterMessageTypes: ["PositionReport"] // Optional!
+    }
+    socket.send(JSON.stringify(subscriptionMessage));
+};
+
+let ships = {};
+
+socket.onmessage = function (event) {
+    let m = JSON.parse(event.data)
+    // console.log(m)
+    let name = m.MetaData.ShipName.trim().replaceAll(' ', '&nbsp;').replaceAll('-', '&#8209;');
+    if ( m.Message.PositionReport.TrueHeading == 511) {
+      m.Message.PositionReport.TrueHeading = 0; // data unaviailable
+    }
+    ships[name] = {
+     'lat' : m.MetaData.latitude,
+      'lon' : m.MetaData.longitude,
+      'updated' : m.MetaData.time_utc,
+      'angle' : m.Message.PositionReport.TrueHeading
+    }
+};
+
+setInterval(function(){
+  remove_old_ships(ships);
+}, 1000);
+
+function remove_old_ships(ships) {
+  let now = Date.now();
+  for (const [key, value] of Object.entries(ships)) {
+    if (now - Date.parse(value.updated) > 10000) { // remove if older than 10 seconds
+      delete ships[key];
+    }
+  }
+}

@@ -5,3 +5,14 @@
       token : 'Put your Mapbox API token here'
     }
 }
+{
+    tfnsw : {
+      token : "Put your TfNSW API key here"
+    },
+    mapbox : 
+    { id: 'Put your Mapbox map ID here',
+      token : 'Put your Mapbox API token here'
+    },
+    ais :
+    {token : "Put your aisstream.io token here" }
+}
