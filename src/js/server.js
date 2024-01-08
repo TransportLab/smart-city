@@ -103,8 +103,8 @@ socket.onopen = function (_) {
     let delta = 0.2;
     let subscriptionMessage = {
         Apikey: keys.ais.token,
-        BoundingBoxes: [[[p.map.center.lat - delta, p.map.center.lng - delta], [p.map.center.lat + delta, p.map.center.lng + delta]]],
-        // FiltersShipMMSI: ["368207620", "367719770", "211476060"], // Optional!
+        // BoundingBoxes: [[[p.map.center.lat - delta, p.map.center.lng - delta], [p.map.center.lat + delta, p.map.center.lng + delta]]],
+        BoundingBoxes: [[[p.model.corners.ne.lat, p.model.corners.ne.lng], [p.model.corners.sw.lat, p.model.corners.sw.lng]]],
         FilterMessageTypes: ["PositionReport"] // Optional!
     }
     socket.send(JSON.stringify(subscriptionMessage));

@@ -137,14 +137,16 @@ fetch("params.json5")
 function init() {
     // Initialize the map
     map = L.map('map', {
-      center: [p.map.center.lat, p.map.center.lng],
-      zoom: p.map.zoom,
+      center: [(p.model.corners.ne.lat + p.model.corners.sw.lat) / 2, (p.model.corners.ne.lng + p.model.corners.sw.lng) / 2],
+      zoom: 13,// initial guess, will be fixed later
       attributionControl: false,
       zoomControl : false,
-      zoomSnap: 0.01,
+      zoomSnap: 0.000001,
     //   scrollWheelZoom: false,
     });
-    p.map.bounds = map.getBounds();
+    let bounds = L.latLngBounds([p.model.corners.ne.lat, p.model.corners.ne.lng], [p.model.corners.sw.lat, p.model.corners.sw.lng]);
+    map.fitBounds(bounds);//, { padding: [50, 50] });
+
     L.control.attribution({attributionControl: false});//.addTo(map);
   
     

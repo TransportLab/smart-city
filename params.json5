@@ -4,6 +4,18 @@
         width : 2600, // width of model in mm
         height : 1980, // height of model in mm
         throw_distance : 3980, // distance from projector to wall in mm
+        pixel_size : 20, // size of pixel in mm
+        url : 'https://data.scigem-eng.sydney.edu.au/elevationfast', // path to server with elevation data
+        corners : {
+            ne : {
+                lat : -33.85230,
+                lng : 151.26176
+            },
+            sw : {
+                lat : -33.89682,
+                lng : 151.15342
+            }
+        }
     },
 
     // projector settings
@@ -12,13 +24,13 @@
         resolution : [1920, 1080], // resolution of projector
     },
 
-    // leaflet settings
+    // leaflet settings -- should be calculated from model properties!
     map : {
-        center : {
-            lat : -33.869303486200685,
-            lng : 151.2071629479017
-        }, // center of map
-        zoom : 13.7, // zoom level of map
+        // center : {
+        //     lat : -33.869303486200685,
+        //     lng : 151.2071629479017
+        // }, // center of map
+        // zoom : 13.7, // zoom level of map
     },
 
     // threejs settings
