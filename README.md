@@ -1,6 +1,9 @@
 # smart city
 Augmented reality smart city installation.
 
+## Competition
+[For information on the competition and how to submit, see here](https://github.com/TransportLab/smart-city/blob/main/COMPETITION.md)
+
 ## Components
   1. 3D model of a city
   2. three.js scene rendered in chrome sent to a projector
