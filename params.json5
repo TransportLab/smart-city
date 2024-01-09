@@ -4,8 +4,8 @@
         width : 2600, // width of model in mm
         height : 1980, // height of model in mm
         throw_distance : 3980, // distance from projector to wall in mm
-        pixel_size : 20, // size of pixel in mm
-        url : 'https://data.scigem-eng.sydney.edu.au/elevationfast', // path to server with elevation data
+        pixel_size : 2, // size of pixel in mm
+        url : 'https://data.scigem-eng.sydney.edu.au/', // path to server with elevation data
         corners : {
             ne : {
                 lat : -33.85230,
