@@ -7,6 +7,12 @@ import requests
 import tifffile
 from tqdm import tqdm
 
+# ALTERNATIVE METHOD USING GDAL:
+# gdalwarp -te 151.145 -33.895 151.265 -33.835 -dstnodata 0 lidar1m.vrt clipped.tif
+# loaded in Fiji, ran a median filter to remove stitching artifacts, then saved as heights.jpg
+# Used Image2Surface Addon in Autodesk Fusion 360 to convert to a BREP, then exported to a STEP file for machining. <---- DID NOT WORK, ENDED UP WITH A "SURFACE" NOT A CLOSED VOLUME
+# Trying FreeCAD (import STL, convert to shape then export)
+
 def create_grid(corners, nx, ny):
     ne = corners['ne']
     sw = corners['sw']

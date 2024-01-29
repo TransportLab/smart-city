@@ -16,6 +16,11 @@ let planes = {}
 let lut = new Lut('bwr',32);
 lut.setMin(-3);
 lut.setMax(3);
+if ( urlParams.has('debug') ) {
+    var debug = true;
+} else {
+    var debug = false;
+}
 
 let routes = {
     'NSN' : { // north shore & western line
@@ -135,18 +140,35 @@ fetch("params.json5")
     });
 
 function init() {
+    let bounds = L.latLngBounds(
+        L.latLng(p.model.corners.sw.lat, p.model.corners.sw.lng),
+        L.latLng(p.model.corners.ne.lat, p.model.corners.ne.lng)
+    );
+    let center = bounds.getCenter();
+
     // Initialize the map
     map = L.map('map', {
-      center: [(p.model.corners.ne.lat + p.model.corners.sw.lat) / 2, (p.model.corners.ne.lng + p.model.corners.sw.lng) / 2],
+      center: center,
       zoom: 13,// initial guess, will be fixed later
       attributionControl: false,
       zoomControl : false,
       zoomSnap: 0.000001,
     //   scrollWheelZoom: false,
     });
-    let bounds = L.latLngBounds([p.model.corners.ne.lat, p.model.corners.ne.lng], [p.model.corners.sw.lat, p.model.corners.sw.lng]);
-    map.fitBounds(bounds);//, { padding: [50, 50] });
-
+    
+    // check bounds are applied nicely
+    if ( debug ) {
+        L.rectangle(bounds, {color: "#ff7800", weight: 3}).addTo(map);
+        console.log('New map bounds:', map.getBounds());
+        var sw = bounds.getSouthWest();
+        var ne = bounds.getNorthEast();
+        var width = ne.lng - sw.lng;
+        var height = ne.lat - sw.lat;
+        console.log('Aspect ratio:', width/height);
+    }
+    
+    map.fitBounds(bounds, true);
+    // map.setView(center, map.getZoom());
     L.control.attribution({attributionControl: false});//.addTo(map);
   
     

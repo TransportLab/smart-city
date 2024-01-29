@@ -1,19 +1,19 @@
 {
     // model properties
     model : {
-        width : 2600, // width of model in mm
-        height : 1980, // height of model in mm
+        width : 2400, // width of model in mm
+        height : 1200, // height of model in mm
         throw_distance : 3980, // distance from projector to wall in mm
-        pixel_size : 2, // size of pixel in mm
+        pixel_size : 1, // size of pixel in mm
         url : 'https://data.scigem-eng.sydney.edu.au/', // path to server with elevation data
         corners : {
             ne : {
-                lat : -33.85230,
-                lng : 151.26176
+                lat : -33.835,
+                lng : 151.265
             },
             sw : {
-                lat : -33.89682,
-                lng : 151.15342
+                lat : -33.895,
+                lng : 151.145
             }
         }
     },
@@ -49,20 +49,20 @@
         show : true, // show gtfs data on map
         url : "https://api.transport.nsw.gov.au/v1/gtfs/vehiclepos/",
         modes : ['buses', 'sydneytrains', 'lightrail/innerwest', 'lightrail/cbdandsoutheast', 'ferries/sydneyferries'],
-        update_interval : 5000, // time in s between gtfs-realtime updates
+        update_interval : 5000, // time in ms between gtfs-realtime updates
     },
 
     // maritime settings
     ais : {
         show : false, // show ais data on map
         url : "wss://stream.aisstream.io/v0/stream",
-        update_interval : 5000, // time in s between ais updates
+        update_interval : 5000, // time in ms between ais updates
     },
 
     // flight tracking settings
     flights : {
         show : true, // show flight data on map
         url : 'https://opensky-network.org/api',
-        update_interval : 21000, // time in s between flight updates, limited by API. Could go faster if just running part of the day
+        update_interval : 21000, // time in ms between flight updates, limited by API. Could go faster if just running part of the day
     }
 }

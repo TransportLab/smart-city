@@ -14,7 +14,8 @@ nx = int(params['model']['width'] / params['model']['pixel_size'])
 ny = int(params['model']['height'] / params['model']['pixel_size'])
 dx = params['model']['pixel_size']
 
-heights = tifffile.imread(f'heights_{nx}_{ny}.tif')
+heights = tifffile.imread(f'heights_{nx}_{ny}.tif').T
+# heights = tifffile.imread(sys.argv[1]).T
 base_plane_height = -5
 
 vertices = []
@@ -23,7 +24,6 @@ faces = []
 for i in range(nx):
     for j in range(ny):
         vertices.append([i*dx, j*dx, heights[i,j]])
-
 # Define faces
 # This is a simple example assuming you have a grid of points and want to create quad faces
 # You'll need to adjust this logic based on your specific points and how they're ordered
