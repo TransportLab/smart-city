@@ -195,6 +195,10 @@ function init() {
             update_radar();
         }, 10000);
     }
+
+    if (p.logo.show) { 
+        render_logo();
+    }
 }
 
 
@@ -389,11 +393,37 @@ function update_radar() {
             let latLngBounds = L.latLngBounds(p.radar.bounds); // hard coded bounds for radar image :(
 
             imageOverlay = L.imageOverlay(imageUrl, latLngBounds, {
-                opacity: 0.8,
+                opacity: p.radar.opacity,
             }).addTo(map);
         }
     })
     .catch(error => {
         // console.log('There has been a problem with your fetch operation:', error);
+    });
+}
+
+function render_logo() {
+    fetch('http://localhost:' + p.server.port + '/' + p.logo.image)
+    .then(response => {
+        console.log(response.status)
+        if (response.ok) { // Check if response status is 200
+            return response.blob();
+        }
+    })
+    .then(blob => {
+        console.log(blob);
+        const imageUrl = URL.createObjectURL(blob);
+        let latLngBounds = L.latLngBounds([
+            [p.logo.loc.lat - p.logo.size, p.logo.loc.lng - p.logo.size],
+            [p.logo.loc.lat + p.logo.size, p.logo.loc.lng + p.logo.size]
+        ]);
+        // L.rectangle(latLngBounds, {color: "#ff7800", weight: 3}).addTo(map);
+
+        L.imageOverlay(imageUrl, latLngBounds, {
+            opacity: p.logo.opacity,
+        }).addTo(map);
+    })
+    .catch(error => {
+        console.log('There has been a problem with building the logo:', error);
     });
 }

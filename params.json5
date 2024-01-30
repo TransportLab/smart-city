@@ -44,6 +44,17 @@
         port : 3000, // port to run server on
     },
 
+    logo : {
+        show : true,
+        image : 'resources/usyd.svg',
+        loc : {
+            lat : -33.8883,
+            lng : 151.186
+        },
+        opacity : 1,
+        size : 0.003, // in degrees
+    },
+
     // transit settings
     gtfs : {
         show : true, // show gtfs data on map
@@ -71,5 +82,6 @@
         url : 'ftp2.bom.gov.au',
         ID : 'IDR714.T', // which radar loop image to show
         bounds : [[-34.27134, 150.51477], [-33.12061, 151.90730]], // bounds of radar image data, pulled from .map file
+        opacity : 1,
     }
 }

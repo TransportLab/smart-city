@@ -14,6 +14,7 @@ import * as HELPERS from './helpers.js';
 
 const app = express()
 app.use(cors());
+app.use('/resources', express.static('resources'))
 
 export let p = HELPERS.parseJson5File('params.json5');
 export let keys = HELPERS.parseJson5File('keys.json5');
@@ -175,3 +176,4 @@ function remove_old_ships(ships) {
     }
   }
 }
+
