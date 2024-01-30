@@ -6,6 +6,7 @@ import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import { gettripupdates } from './gtfs.js';
 import Papa from 'papaparse';
 import WebSocket from 'ws';
+import ftp from 'ftp';
 
 // import { socket } from './ships.js';
 import * as HELPERS from './helpers.js';
@@ -95,6 +96,39 @@ fetch(p.flights.url, {
 .catch(error => {
   console.error('There has been a problem with your fetch operation:', error);
 });
+});
+
+app.get('/update_radar/', (req, res) => {
+  const client = new ftp();
+  const now = new Date();
+  now.setUTCMinutes(now.getUTCMinutes() - 2); // Subtract two minutes to give time for data to be available
+
+  const formattedDateTime = HELPERS.formatDateTime(now);
+  // console.log('anon/gen/radar/' + p.radar.ID + '.' + formattedDateTime + '.png')
+  client.on('ready', () => {
+    client.get('anon/gen/radar/' + p.radar.ID + '.' + formattedDateTime + '.png', (err, stream) => {
+      if (err) {
+        // console.warn(err);
+        client.end();
+        if (err.code === 550) { // FTP error code 550 indicates file not found or no access
+            res.status(404).send('Image not found');
+        } else {
+            res.status(500).send('Internal server error');
+        }
+        return;
+    } else {
+      stream.once('close', () => client.end());
+
+      // You can either save the image and then send it
+      // Or directly pipe the stream to the response
+      stream.pipe(res);
+    }
+  });
+  });
+
+  client.connect({
+      host: p.radar.url,
+  });
 });
 
 const socket = new WebSocket(p.ais.url);

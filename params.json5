@@ -64,5 +64,12 @@
         show : true, // show flight data on map
         url : 'https://opensky-network.org/api',
         update_interval : 21000, // time in ms between flight updates, limited by API. Could go faster if just running part of the day
+    },
+
+    radar : {
+        show : true,
+        url : 'ftp2.bom.gov.au',
+        ID : 'IDR714.T', // which radar loop image to show
+        bounds : [[-34.27134, 150.51477], [-33.12061, 151.90730]], // bounds of radar image data, pulled from .map file
     }
 }

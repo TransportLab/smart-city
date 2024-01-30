@@ -11,5 +11,3 @@
 3. Mount foam to wall
 4. Laser etch QR code into [anodized aluminum sheet](https://au.rs-online.com/web/p/metal-sheets/7781692)
 5. Mount qr code to wall
-# Code
-1. Add a raster layer, [BoM radar](http://www.bom.gov.au/catalogue/data-feeds.shtml#radar)?

@@ -14,8 +14,9 @@ nx = int(params['model']['width'] / params['model']['pixel_size'])
 ny = int(params['model']['height'] / params['model']['pixel_size'])
 dx = params['model']['pixel_size']
 
-heights = tifffile.imread(f'heights_{nx}_{ny}.tif').T
-# heights = tifffile.imread(sys.argv[1]).T
+filename = sys.argv[1]
+# heights = tifffile.imread(f'heights_{nx}_{ny}.tif').T
+heights = tifffile.imread(filename).T
 base_plane_height = -5
 
 vertices = []
@@ -100,4 +101,4 @@ for i in range(ny-1):
 model.update_normals()
 
 # Write the mesh to file
-model.save(f'heights_{nx}_{ny}.stl')
+model.save(filename.split('.')[0] + '.stl')

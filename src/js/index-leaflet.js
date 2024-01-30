@@ -21,6 +21,7 @@ if ( urlParams.has('debug') ) {
 } else {
     var debug = false;
 }
+let imageOverlay;
 
 let routes = {
     'NSN' : { // north shore & western line
@@ -171,7 +172,6 @@ function init() {
     // map.setView(center, map.getZoom());
     L.control.attribution({attributionControl: false});//.addTo(map);
   
-    
     fetch("keys.json5")
     .then(r => 
         r.text()
@@ -190,6 +190,11 @@ function init() {
    
 
     setInterval(animate, p.gtfs.update_interval);
+    if (p.radar.show) { 
+        setInterval(function(){
+            update_radar();
+        }, 10000);
+    }
 }
 
 
@@ -353,9 +358,9 @@ function get_ships() {
 
 setInterval(function(){
     remove_old_ships(ships);
-  }, 10000);
+}, 10000);
   
-  function remove_old_ships(ships) {
+function remove_old_ships(ships) {
     let now = Date.now();
     for (const [key, value] of Object.entries(ships)) {
       if (now - Date.parse(value.updated) > 300000) { // remove older than 5 mins (should refresh at least once every 3 mins)
@@ -364,4 +369,31 @@ setInterval(function(){
         console.log('Removing: ' + key)
       }
     }
-  }
+}
+
+function update_radar() {
+    fetch('http://localhost:' + p.server.port + '/update_radar/')
+    .then(response => {
+        console.log(response.status)
+        if (response.ok) { // Check if response status is 200
+            return response.blob();
+        }
+    })
+    .then(blob => {
+        if ( debug ) { console.log(blob); }
+        const imageUrl = URL.createObjectURL(blob);
+        if (imageOverlay) {
+            // Update the existing ImageOverlay
+            imageOverlay.setUrl(imageUrl);
+        } else {
+            let latLngBounds = L.latLngBounds(p.radar.bounds); // hard coded bounds for radar image :(
+
+            imageOverlay = L.imageOverlay(imageUrl, latLngBounds, {
+                opacity: 0.8,
+            }).addTo(map);
+        }
+    })
+    .catch(error => {
+        // console.log('There has been a problem with your fetch operation:', error);
+    });
+}
