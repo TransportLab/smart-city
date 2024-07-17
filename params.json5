@@ -65,7 +65,7 @@
 
     // maritime settings
     ais : {
-        show : false, // show ais data on map
+        show : true, // show ais data on map
         url : "wss://stream.aisstream.io/v0/stream",
         update_interval : 5000, // time in ms between ais updates
     },
@@ -77,11 +77,29 @@
         update_interval : 21000, // time in ms between flight updates, limited by API. Could go faster if just running part of the day
     },
 
+    // weather radar settings
     radar : {
-        show : true,
-        url : 'ftp2.bom.gov.au',
-        ID : 'IDR714.T', // which radar loop image to show
+        show : true, // show radar data on map
+        url : 'ftp.bom.gov.au',
+        ID : 'IDR714', // which radar loop image to show
         bounds : [[-34.27134, 150.51477], [-33.12061, 151.90730]], // bounds of radar image data, pulled from .map file
-        opacity : 1,
+        opacity : 0.5,
+        update_interval : 10000, // time in ms between radar updates
+    },
+
+    // traffic hazards
+    hazards : {
+        show : true, // show traffic hazards on map
+        url : 'https://api.transport.nsw.gov.au/v1/live/hazards',
+        modes : [
+            // '/fire/closed','/fire/open',
+            // '/flood/closed','/flood/open',
+            // '/incident/closed','/incident/open',
+            // '/majorevent/closed','/majorevent/open',
+            '/roadwork/closed',
+            // '/roadwork/open',
+            // '/regional-lga-incident/closed','/regional-lga-incident/open'
+            ],
+        update_interval : 5000, // time in ms between hazard updates
     }
 }
