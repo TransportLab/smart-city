@@ -359,6 +359,7 @@ function update_flights() {
                 logger('Removing flight: ' + key)
             }
             res.states.forEach((state, index) => {
+                let callsign = state[1];
                 let lng = state[5];
                 let lat = state[6];
                 let angle = state[10];
@@ -376,7 +377,8 @@ function update_flights() {
                         className: 'plane',
                         iconSize: [40, 40],
                         iconAnchor: [20, 20],
-                        html: '<img src="' + svg_path + '" style="transform: rotate(' + String(angle) + 'deg);">' // Rotate by 45 degrees
+                        zIndexOffset: 1000, // make sure it's on top of everything
+                        html: '<img src="' + svg_path + '" style="transform: rotate(' + String(angle) + 'deg);"><div>' + callsign + '</div>'
                     })
                 });
                 planes[index] = icon;

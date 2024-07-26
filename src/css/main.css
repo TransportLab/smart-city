@@ -12,10 +12,6 @@ canvas {
   position: fixed;
   width: 100%;
   height: 100%;
-  /* padding: 0; */
-  /* height: 0; */
-  /* padding-bottom: 100%; */
-  /* cursor: none; */
 }
 
 .gtfs {
@@ -79,10 +75,20 @@ canvas {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 .plane img {
   width: 100%;
   height: 100%;
   transform-origin: center;
+  z-index: 1000;
+}
+.plane div {
+  display: inline-block;
+  background-color: white;
+  padding: 0px 2px;
+  border: 1px solid white;
+  border-radius: 5px;
+  z-index: 1000;
 }
   
