@@ -362,13 +362,20 @@ function update_flights() {
                 let lng = state[5];
                 let lat = state[6];
                 let angle = state[10];
+                let category = state[17];
+                let svg_path;
+
+                if ( category == 8 ) { // rotorcraft
+                    svg_path = '../../resources/helicopter.svg';
+                } else {
+                    svg_path = '../../resources/plane.svg';
 
                 var icon = L.marker([lat, lng], {
                     icon: L.divIcon({
                         className: 'plane',
                         iconSize: [40, 40],
                         iconAnchor: [20, 20],
-                        html: '<img src="../../resources/plane.svg" style="transform: rotate(' + String(angle) + 'deg);">' // Rotate by 45 degrees
+                        html: '<img src="' + svg_path + '" style="transform: rotate(' + String(angle) + 'deg);">' // Rotate by 45 degrees
                     })
                 });
                 planes[index] = icon;
