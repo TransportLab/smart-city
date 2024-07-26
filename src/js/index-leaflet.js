@@ -369,6 +369,7 @@ function update_flights() {
                     svg_path = '../../resources/helicopter.svg';
                 } else {
                     svg_path = '../../resources/plane.svg';
+                }
 
                 var icon = L.marker([lat, lng], {
                     icon: L.divIcon({
