@@ -1,0 +1,15 @@
+[Unit]
+Description=Startup webhook
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=smartcity
+WorkingDirectory=/opt/smart-city/
+ExecStart=/opt/smart-city/sys/webhook.sh
+ExecStartPost=/opt/smart-city/sys/start_kiosk.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Git Auto Pull every 5 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Unit=smart-city-auto-git-pull.service
+
+[Install]
+WantedBy=timers.target

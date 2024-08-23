@@ -1,0 +1,16 @@
+[Unit]
+Description=Start browser fullscreen
+Wants=network-online.target
+Requires=graphical.target
+After=network-online.target smart-city-server.service
+
+[Service]
+Environment=DISPLAY=:0.0
+Environment=XAUTHORITY=/home/%u/.Xauthority
+Type=simple
+ExecStart=firefox -kiosk http://localhost:8080
+Restart=on-abort
+
+[Install]
+WantedBy=graphical.target
+

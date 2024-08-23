@@ -22,7 +22,7 @@ For the 3D model, we used a CNC machine to cut rigid extruded polystyrene sheets
 Code to generate the 3D model is contained in `src/python/`. Set the bounding box and physical dimensions you're interested in in `params.json5`, then you can run `get_elevation.py` to pull high resolution elevation data from our web server. You can then run `make_stl.py` to convert that elevation data to a mesh that can be CNC machined. Alternatively you can use [another service such as this](https://jthatch.com/Terrain2STL/).
 
 ## Software
-  1. Download or clone this repository
+  1. Download or clone this repository into `/opt/smart-city/`
   2. Install [Node.js](https://nodejs.org/en/)
   3. Install the required dependencies with `npm install`
   4. Install `webpack` with `npm install -g webpack` (may require `sudo`)
@@ -32,6 +32,9 @@ Code to generate the 3D model is contained in `src/python/`. Set the bounding bo
     3. Register another account with `https://opensky-network.org/` to get flight data and copy the API key across.
     4. Register another account with `https://aisstream.io/` to get marine data and copy the API key across.
   7. Open a terminal and navigate to the project directory. Run `npm start` to start the server and open a browser window with the projector interface.
+  8. To set things up permanently, each of the `.service` files in the `sys` subfolder need to be copied across to `/etc/systemd/system/` and then enabled and started with `systemctl enable <service-name>`. The git pull service doesnt need to be enabled, just the timer.
+  9. We also need to set up the BIOS to restart the computer when it loses power. This is done by going into the BIOS (keep pushing F2 after restart) and setting the power loss option to restart.
+  10. If you want remote access, consider installing RustDesk or equivalent.
 
 ## Usage
 Many system parameters are controlled by URL flags, such as `debug` which can be used as:

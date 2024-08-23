@@ -1,0 +1,12 @@
+[Unit]
+Description=Startup webhook
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simpley
+WorkingDirectory=/opt/smart-city/
+ExecStart=npx webpack serve
+
+[Install]
+WantedBy=multi-user.target

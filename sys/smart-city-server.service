@@ -1,0 +1,12 @@
+[Unit]
+Description=smart city communications server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/smart-city/
+ExecStart=npx nodemon /opt/smart-city/src/js/server.js
+
+[Install]
+WantedBy=multi-user.target

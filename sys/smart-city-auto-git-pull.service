@@ -1,0 +1,8 @@
+[Unit]
+Description=Auto Git Pull Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/smart-city/auto-pull.sh
+WorkingDirectory=/opt/smart-city/
