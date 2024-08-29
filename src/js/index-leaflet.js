@@ -152,6 +152,10 @@ fetch("params.json5")
 
 
 function init() {
+    document.documentElement.style.setProperty('--aspect-ratio', String(p.model.width / p.model.height)); // Set a new aspect ratio
+    document.documentElement.style.setProperty('--v-offset', String(p.projector.vertical_offset) + 'px'); // Set a new max height
+
+
     let bounds = L.latLngBounds(
         L.latLng(p.model.corners.sw.lat, p.model.corners.sw.lng),
         L.latLng(p.model.corners.ne.lat, p.model.corners.ne.lng)
@@ -366,7 +370,7 @@ function update_flights() {
                 let category = state[17];
                 let svg_path;
 
-                if ( category == 8 ) { // rotorcraft
+                if (category == 8) { // rotorcraft
                     svg_path = '../../resources/helicopter.svg';
                 } else {
                     svg_path = '../../resources/plane.svg';
@@ -531,14 +535,14 @@ function logger(msg) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-          },
-        body: JSON.stringify({message : msg}),
+        },
+        body: JSON.stringify({ message: msg }),
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Message logged on the server:', data.message);
-    })
-    .catch(error => {
-        console.error('Error logging message:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log('Message logged on the server:', data.message);
+        })
+        .catch(error => {
+            console.error('Error logging message:', error);
+        });
 }

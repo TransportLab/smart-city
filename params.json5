@@ -20,8 +20,9 @@
 
     // projector settings
     projector : {
-        aspect_ratio : 1.6, // aspect ratio of projector
+        aspect_ratio : 1.777778, // aspect ratio of projector
         resolution : [1920, 1080], // resolution of projector
+        vertical_offset : -10, // vertical offset of projector in pixels
     },
 
     // leaflet settings -- should be calculated from model properties!
