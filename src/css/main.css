@@ -5,11 +5,14 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  cursor: none;
 }
 #map {
   width: 100%;
   height: calc(100vw / var(--aspect-ratio));
   margin-top: var(--v-offset);
+  transform: scaleX(var(--h-scale));
+  overflow: hidden;
 }
 
 canvas {
@@ -18,22 +21,22 @@ canvas {
 
 .gtfs {
   display: inline-block;
-  font-size: 12px;
+  font-size: 24px;
   font-weight: bold;
-  border-radius: 18px;
-  min-width: 18px; /*  should be same as border radius */
+  border-radius: 30px;
+  min-width: 30px; /*  should be same as border radius */
   text-align: center;
   color: white;
-  line-height: 20px; /* height plus padding? */
-  height: 18px;
-  padding: 2px 2px;
+  line-height: 32px; /* height plus padding? */
+  height: 30px;
+  padding: 6px 6px;
   /* margin: 5px; */
   border: 2px solid white;
 }
 
 .ship {
   text-align: center;
-  font-size: 8px;
+  font-size: 18px;
   color: black;
   background-color: white;
   padding: 2px;
@@ -49,10 +52,10 @@ canvas {
   left: -8px;
   top: -1px;
   width: 6px;
-  height: 11px;
+  height: 27px;
   padding: 2px;
   background-color: white;
-  border-radius: 10px 0 0 10px;
+  border-radius: 20px 0 0 20px;
   border: 1px solid white;
   z-index: -1;
 }
@@ -63,11 +66,11 @@ canvas {
   right: -24px; /* Extend 20px to the right */
   top: -1px;  /* Align the top to center the curve */
   width: 20px;  /* Width of the extended part */
-  height: 13px; /* Total height to match the curve */
+  height: 32px; /* Total height to match the curve */
   padding: 2px;
   background-color: white;
   /* clip-path: path('M0 0 C10 0, 20 4, 20 7, 20 11, 10 14, 0 18'); */
-  clip-path: path('M0 0 Q25 9, 0 18');
+  clip-path: path('M0 0 Q35 16, 0 32');
 
   /* border: 1px solid white; */
   z-index: -1;
@@ -87,6 +90,7 @@ canvas {
 }
 .plane div {
   display: inline-block;
+  font-size: 24px;
   background-color: white;
   padding: 0px 2px;
   border: 1px solid white;

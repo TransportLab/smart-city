@@ -154,6 +154,7 @@ fetch("params.json5")
 function init() {
     document.documentElement.style.setProperty('--aspect-ratio', String(p.model.width / p.model.height)); // Set a new aspect ratio
     document.documentElement.style.setProperty('--v-offset', String(p.projector.vertical_offset) + 'px'); // Set a new max height
+    document.documentElement.style.setProperty('--h-scale', String(p.projector.horizontal_scale)); // Set a new max height
 
 
     let bounds = L.latLngBounds(
@@ -168,7 +169,7 @@ function init() {
         zoom: 13,// initial guess, will be fixed later
         attributionControl: false,
         zoomControl: false,
-        zoomSnap: 0.000001,
+        zoomSnap: 0,
         //   scrollWheelZoom: false,
     });
 
@@ -181,7 +182,9 @@ function init() {
         var width = ne.lng - sw.lng;
         var height = ne.lat - sw.lat;
         console.log('Aspect ratio:', width / height);
+
     }
+    document.addEventListener('keypress', handleKeyPress);
 
     map.fitBounds(bounds, true);
     // map.setView(center, map.getZoom());
@@ -199,6 +202,7 @@ function init() {
                 id: keys.mapbox.id,
                 tileSize: 512,
                 zoomOffset: -1,
+                zoomSnap: 0,
                 accessToken: keys.mapbox.token
             }).addTo(map);
         });
@@ -545,4 +549,26 @@ function logger(msg) {
         .catch(error => {
             console.error('Error logging message:', error);
         });
+}
+function handleKeyPress(event) {
+    let currentZoom = map.getZoom();
+
+    if (event.key == 'w') {
+        map.setZoom(currentZoom + 0.001);
+    } else if (event.key == 's') {
+        map.setZoom(currentZoom - 0.001);
+    } else if (event.key == 'W') {
+        map.setZoom(currentZoom + 0.01);
+    } else if (event.key == 'S') {
+        map.setZoom(currentZoom - 0.01);
+    } else if (event.key == 'a') {
+        p.projector.horizontal_scale += 0.001;
+    } else if (event.key == 'd') {
+        p.projector.horizontal_scale -= 0.001;
+    }
+    
+    document.documentElement.style.setProperty('--h-scale', String(p.projector.horizontal_scale)); // Set a new max height
+    logger('New map zoom ' + String(map.getZoom() + ' Bounds: ' + JSON.stringify(map.getBounds())));
+    logger('Horizontal scale: ' + String(p.projector.horizontal_scale))
+
 }

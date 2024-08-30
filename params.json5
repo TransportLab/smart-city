@@ -8,21 +8,28 @@
         url : 'https://data.scigem-eng.sydney.edu.au/', // path to server with elevation data
         corners : {
             ne : {
-                lat : -33.835,
-                lng : 151.265
+                // lat : -33.835,
+                // lng : 151.265
+                lat : -33.83512300658737,
+                lng : 151.27599316594075
             },
             sw : {
-                lat : -33.895,
-                lng : 151.145
+                //lat : -33.895,
+                //lng : 151.145
+                lat : -33.894722633376766,
+                lng: 151.13296645445593
             }
         }
     },
+
+    // Bounds: {"_southWest":{"lat":,"lng":},"_northEast":{"lat":,"lng":}}
 
     // projector settings
     projector : {
         aspect_ratio : 1.777778, // aspect ratio of projector
         resolution : [1920, 1080], // resolution of projector
         vertical_offset : -10, // vertical offset of projector in pixels
+        horizontal_scale : 1.1839999999999904
     },
 
     // leaflet settings -- should be calculated from model properties!
