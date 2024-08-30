@@ -99,6 +99,9 @@ app.get('/update_gtfs/*', async (req, res) => {
 });
 
 app.get('/update_ships/', async (req, res) => {
+  if (Object.keys(ships).length === 0) {
+    return res.json(null);
+  }
   res.json(ships);
 });
 

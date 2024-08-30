@@ -321,6 +321,9 @@ function update_gtfs() {
 
 function update_ships() {
     get_ships().then(new_ships => {
+        if (new_ships === null) {
+            return;
+        }
         for (const [key, e] of Object.entries(new_ships)) {
             if (map.getBounds().contains(new L.LatLng(e.lat, e.lon))) {
                 if (!ferry_names.includes(key)) {
