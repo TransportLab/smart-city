@@ -321,7 +321,7 @@ function update_gtfs() {
 
 function update_ships() {
     get_ships().then(new_ships => {
-        if (new_ships === null) {
+        if (new_ships === null || new_ships === undefined) {
             return;
         }
         for (const [key, e] of Object.entries(new_ships)) {
@@ -420,7 +420,7 @@ function get_gtfs(mode) {
         })
         .catch(error => {
             console.error('There has been a problem with your fetch operation:', error);
-            throw error; // Re-throw to propagate the error
+            // throw error; // Re-throw to propagate the error
         });
 }
 
@@ -434,7 +434,7 @@ function get_ships() {
         })
         .catch(error => {
             console.error('There has been a problem with your fetch operation:', error);
-            throw error; // Re-throw to propagate the error
+            // throw error; // Re-throw to propagate the error
         });
 }
 
