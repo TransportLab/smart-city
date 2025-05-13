@@ -28,7 +28,7 @@
     projector : {
         aspect_ratio : 1.777778, // aspect ratio of projector
         resolution : [1920, 1080], // resolution of projector
-        vertical_offset : -10, // vertical offset of projector in pixels
+        vertical_offset : 50, // vertical offset of projector in pixels
         horizontal_scale : 1.1839999999999904
     },
 
@@ -94,7 +94,7 @@
 
     // weather radar settings
     radar : {
-        show : true, // show radar data on map
+        show : false, // show radar data on map
         url : 'ftp.bom.gov.au',
         ID : 'IDR714', // which radar loop image to show
         bounds : [[-34.27134, 150.51477], [-33.12061, 151.90730]], // bounds of radar image data, pulled from .map file
