@@ -98,6 +98,51 @@ app.get('/update_gtfs/*', async (req, res) => {
   }
 });
 
+app.get('/update_gtfs2/*', async (req, res) => {
+  let locs = [];
+  // const subpaths = req.params[0].split('/');
+  // const mode = subpaths[-1];
+  // const route = let joined = strings.slice(0, -1).join(", "); // Joins all but the last element'
+
+  try {
+    const res2 = await fetch(p.gtfs2.url + req.params[0], {
+      headers: {
+        "Authorization": "apikey " + keys.tfnsw.token,
+        // "Access-Control-Allow-Origin" : 'origin',
+        // "accept": "application/x-google-protobuf"
+      },
+      //   mode: "no-cors"
+    });
+    if (!res2.ok) {
+      const error = new Error(`${res2.url}: ${res2.status} ${res2.statusText}`);
+      error.response = res2;
+      throw error;
+    }
+    const buffer = await res2.arrayBuffer();
+    const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
+      new Uint8Array(buffer)
+    );
+    // logger.info(feed)
+    feed.entity.forEach((e) => {
+      if (e.vehicle) {
+        // let routeId = e.vehicle.trip.routeId.split('_')[0];
+        // e['short_route_id'] = routes[routeId];
+        // logger.info(e.vehicle.trip.routeId)
+        // if ( e.vehicle.trip.routeId.includes('T3') ) {
+        //     logger.info(e.vehicle.trip.routeId)
+        // }
+
+        locs.push(e);
+      }
+    });
+    // send the data back to the client
+    res.json(locs);
+  }
+  catch (error) {
+    logger.info(error);
+  }
+});
+
 app.get('/update_ships/', async (req, res) => {
   if (Object.keys(ships).length === 0) {
     return res.json(null);

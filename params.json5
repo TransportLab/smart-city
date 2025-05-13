@@ -67,7 +67,14 @@
     gtfs : {
         show : true, // show gtfs data on map
         url : "https://api.transport.nsw.gov.au/v1/gtfs/vehiclepos/",
-        modes : ['buses', 'sydneytrains', 'lightrail/innerwest', 'lightrail/cbdandsoutheast', 'ferries/sydneyferries'],
+        modes : ['buses', 'lightrail/innerwest', 'lightrail/cbdandsoutheast', 'ferries/sydneyferries'],
+        update_interval : 5000, // time in ms between gtfs-realtime updates
+    },
+
+    gtfs2 : {
+        show : true, // show gtfs data on map
+        url : "https://api.transport.nsw.gov.au/v2/gtfs/vehiclepos/",
+        modes : ['metro', 'sydneytrains'],
         update_interval : 5000, // time in ms between gtfs-realtime updates
     },
 

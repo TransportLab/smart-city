@@ -209,6 +209,7 @@ function init() {
 
 
     setInterval(animate, p.gtfs.update_interval);
+    setInterval(animate, p.gtfs2.update_interval);
 
     if (p.radar.show) {
         setInterval(function () {
@@ -242,6 +243,9 @@ function animate() {
 
     if (p.gtfs.show) {
         update_gtfs();
+    }
+    if (p.gtfs2.show) {
+        update_gtfs2();
     }
     if (p.ais.show) {
         update_ships();
@@ -318,6 +322,80 @@ function update_gtfs() {
             });
     });
 }
+
+function update_gtfs2() {
+    p.gtfs2.modes.forEach((mode) => {
+        get_gtfs2(mode)
+            .then(data => {
+                data.forEach((e) => {
+                    if (e.vehicle.position !== undefined) {
+                        if (map.getBounds().contains(new L.LatLng(e.vehicle.position.latitude, e.vehicle.position.longitude))) {
+                            if (e.vehicle.trip.routeId !== undefined) {
+                                let route, color, label;
+                                let skip = false;
+                                if (mode === 'sydneytrains') {
+                                    route = e.vehicle.trip.routeId.split('_')[0];
+                                    if (route in routes) {
+                                        label = routes[route]['label'];
+                                        color = routes[route]['color'];
+                                    } else {
+                                        skip = true;
+                                    }
+                                } else if (mode === 'metro') {
+                                    console.log(e.vehicle.trip)
+                                    route = e.vehicle.trip.routeId.split('_')[1];
+                                    color = '#168388';
+                                    label = route;
+                                } else if (mode === 'buses') {
+                                    route = e.vehicle.trip.routeId.split('_')[1];
+                                    color = '#00B5EF';
+                                    label = route;
+                                } else if (mode === 'ferries/sydneyferries') {
+                                    route = e.vehicle.trip.routeId.split('-')[1];
+                                    if (route in ferries) {
+                                        color = ferries[route]['color'];
+                                        label = route;
+                                    } else {
+                                        skip = true;
+                                    }
+                                }
+                                else { // lightrail
+                                    route = e.vehicle.trip.routeId
+                                    if (route in routes) {
+                                        label = routes[route]['label'];
+                                        color = routes[route]['color'];
+                                    } else {
+                                        skip = true;
+                                    }
+                                }
+                                // console.log(route)
+                                if (!skip) {
+                                    if (e.vehicle.vehicle.id in vehicles) {
+                                        vehicles[e.vehicle.vehicle.id].setLatLng([e.vehicle.position.latitude, e.vehicle.position.longitude]);
+                                    } else {
+                                        var icon = L.marker([e.vehicle.position.latitude, e.vehicle.position.longitude], {
+                                            icon: L.divIcon({
+                                                className: '',
+                                                html: '<span class="gtfs" style="background-color:' + color + '">' + label + '</span>'
+                                            })
+                                        });
+                                        icon.updated = e.vehicle.timestamp * 1000;
+                                        vehicles[e.vehicle.vehicle.id] = icon;
+                                        icon.addTo(map);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching locations:', error);
+                // Handle the error
+            });
+    });
+}
+
 
 function update_ships() {
     get_ships().then(new_ships => {
@@ -412,6 +490,20 @@ function update_hazards() {
 
 function get_gtfs(mode) {
     return fetch('http://localhost:' + p.server.port + '/update_gtfs/' + mode)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Return the parsed JSON
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            // throw error; // Re-throw to propagate the error
+        });
+}
+
+function get_gtfs2(mode) {
+    return fetch('http://localhost:' + p.server.port + '/update_gtfs2/' + mode)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
