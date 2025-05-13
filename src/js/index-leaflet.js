@@ -7,6 +7,38 @@ import * as L from "leaflet";
 
 import JSON5 from 'json5';
 
+function logger(msg, level = 'info') {
+    // Validate the level
+    const validLevels = ['debug', 'info', 'warn', 'error'];
+    if (!validLevels.includes(level)) {
+        console.error('Invalid log level:', level);
+        return;
+    }
+
+    // Use default port if p or p.server.port is undefined
+    const port = (p && p.server && p.server.port) ? p.server.port : 3000;
+
+    fetch('http://localhost:' + port + '/log', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: msg, level: level }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            console.log('Message logged on the server:', data.message);
+        } else if (data.error) {
+            console.error('Error from server:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error logging message:', error);
+    });
+}
+
+
 let map;
 const urlParams = new URLSearchParams(window.location.search);
 let p; // parameters to be loaded from json file
@@ -31,6 +63,10 @@ let routes = {
     'IWL': { // inner west & leppington line
         label: 'T2',
         color: '#0098CD',
+    },
+    'T3': { // bankstown line
+        label: 'T3',
+        color: '#F37021',
     },
     'BNK': { // bankstown line
         label: 'T3',
@@ -132,23 +168,20 @@ let ferries = {
 }
 
 let ferry_names = [
-    'John Nutt', 'Frances Bodkin', 'Kurt Fearnley', 'Lauren Jackson', 'Liz Ellis', 'Cheryl Salisbury', 'Ethel Turner', 'Ruth Park', 'Olive Cotton', 'Margaret Olley', 'Esme Timbery', 'Ruby Langford', 'Fairlight', 'Clontarf', 'Balmoral', 'Me&#8209;mel', 'Catherine Hamlin', 'Fred Hollows', 'Victor Chang', 'Pemulwuy', 'Bungaree', 'Birrabirragal', 'Bulane', 'Burraneer', 'May Gibbs', 'Sirius', 'Supply', 'Freshwater', 'Fishburn', 'Borrowdale', 'Scarborough', 'Friendship', 'Marjorie Jackson', 'Golden Grove', 'Marlene Mathews', 'Evonne Goolagong', 'Dawn Fraser', 'Betty Cuthbert', 'Collaroy', 'Shane Gould', 'Alexander', 'Queenscliff', 'Charlotte'
+    'John Nutt', 'Frances Bodkin', 'Kurt Fearnley', 'Lauren Jackson', 'Liz Ellis', 'Cheryl Salisbury', 'Ethel Turner', 'Ruth Park', 'Olive Cotton', 'Margaret Olley', 'Esme Timbery', 'Ruby Langford', 'Fairlight', 'Clontarf', 'Balmoral', 'Me&#8209;mel', 'Catherine Hamlin', 'Fred Hollows', 'Victor Chang', 'Pemulwuy', 'Bungaree', 'Birrabirragal', 'Bulane', 'Burraneer', 'May Gibbs', 'Sirius', 'Supply', 'Freshwater', 'Fishburn', 'Borrowdale', 'Scarborough', 'Friendship', 'Marjorie Jackson', 'Golden Grove', 'Marlene Mathews', 'Evonne Goolagong', 'Dawn Fraser', 'Betty Cuthbert', 'Collaroy', 'Shane Gould', 'Alexander', 'Queenscliff', 'Charlotte', 'Nicole Livingstone'
 ];
 ferry_names = ferry_names.map(str => str.toUpperCase().replace(/ /g, '&nbsp;')); // make uppercase and replace spaces with non-breaking spaces
 
 
-
-
-
-fetch("params.json5")
-    .then(r =>
-        r.text()
-    )
-    .then((data) => {
+fetch('params.json5')
+    .then(response => response.text())
+    .then(data => {
         p = JSON5.parse(data);
-        init()
+        init();
+    })
+    .catch(error => {
+        console.error('Error fetching or parsing params.json5:', error);
     });
-
 
 
 function init() {
@@ -205,6 +238,9 @@ function init() {
                 zoomSnap: 0,
                 accessToken: keys.mapbox.token
             }).addTo(map);
+        })
+        .catch(error => {
+            logger('Error fetching or parsing keys.json5: ' + error.message, 'error');
         });
 
 
@@ -223,7 +259,9 @@ function init() {
         }, p.flights.update_interval);
     }
 
+    logger("Current p: " + JSON.stringify(p), "info");
     if (p.logo.show) {
+        // logger("Asking to render logo", "info");
         render_logo();
     }
 
@@ -267,8 +305,14 @@ function update_gtfs() {
                                         label = routes[route]['label'];
                                         color = routes[route]['color'];
                                     } else {
+                                        logger("Did not find a matching route for: " + route, "debug");
                                         skip = true;
                                     }
+                                } else if (mode === 'metro') {
+                                    route = e.vehicle.trip.routeId;
+                                    // skip = true;
+                                    color = '#00FF00';
+                                    label = "M1";
                                 } else if (mode === 'buses') {
                                     route = e.vehicle.trip.routeId.split('_')[1];
                                     color = '#00B5EF';
@@ -313,8 +357,7 @@ function update_gtfs() {
                 });
             })
             .catch(error => {
-                console.error('Error fetching locations:', error);
-                // Handle the error
+                logger('Error fetching locations: ' + JSON.stringify(error), "error");
             });
     });
 }
@@ -367,7 +410,7 @@ function update_flights() {
             for (const [key, value] of Object.entries(planes)) {
                 map.removeLayer(planes[key]);
                 delete planes[key];
-                logger('Removing flight: ' + key)
+                logger('Removing flight: ' + key, "debug");
             }
             res.states.forEach((state, index) => {
                 let callsign = state[1];
@@ -419,8 +462,7 @@ function get_gtfs(mode) {
             return response.json(); // Return the parsed JSON
         })
         .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-            // throw error; // Re-throw to propagate the error
+            logger('Error fetching gtfs: ' + JSON.stringify(error), "error");
         });
 }
 
@@ -433,8 +475,7 @@ function get_ships() {
             return response.json(); // Return the parsed JSON
         })
         .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-            // throw error; // Re-throw to propagate the error
+            logger('Error fetching ships: ' + JSON.stringify(error), "error");
         });
 }
 
@@ -447,9 +488,8 @@ function get_flights() {
             return response.json(); // Return the parsed JSON
         })
         .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
+            logger('Error fetching flights: ' + JSON.stringify(error), "error");
             return { states: null };
-            // throw error; // Re-throw to propagate the error
         });
 }
 
@@ -462,8 +502,7 @@ function get_hazards(mode) {
             return response.json(); // Return the parsed JSON
         })
         .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-            throw error; // Re-throw to propagate the error
+            logger('Error fetching hazards: ' + JSON.stringify(error), "error");
         });
 }
 
@@ -507,15 +546,16 @@ function update_radar() {
             }
         })
         .catch(error => {
-            console.log('There has been a problem with your fetch operation:', error);
+            logger('Error fetching radar: ' + JSON.stringify(error), "error");
         });
 }
 
 function render_logo() {
+    logger('Asking server for: http://localhost:' + p.server.port + '/' + p.logo.image, "info");
     fetch('http://localhost:' + p.server.port + '/' + p.logo.image)
         .then(response => {
-            if (debug) { console.log('Got logo response: ', response.status) }
-            if (response.ok) { // Check if response status is 200
+            logger('Got logo response: ' + response.status, "info");
+            if (response.ok) { 
                 return response.blob();
             }
         })
@@ -532,27 +572,11 @@ function render_logo() {
             }).addTo(map);
         })
         .catch(error => {
-            console.log('There has been a problem with building the logo:', error);
+            logger('Error fetching logo: ' + JSON.stringify(error), "error");
         });
 }
 
-function logger(msg) {
-    // console.log(msg);
-    fetch('http://localhost:' + p.server.port + '/log', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ message: msg }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Message logged on the server:', data.message);
-        })
-        .catch(error => {
-            console.error('Error logging message:', error);
-        });
-}
+
 function handleKeyPress(event) {
     let currentZoom = map.getZoom();
 
